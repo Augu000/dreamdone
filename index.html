@@ -37,10 +37,10 @@
     <label for="dreamTitle">Dream Title:</label><br>
     <input type="text" id="dreamTitle" placeholder="e.g., Buy a car"><br>
 
-    <label for="dreamPrice">Dream Price (in dollars):</label><br>
+    <label for="dreamPrice">Dream Price (in euros):</label><br>
     <input type="number" id="dreamPrice" placeholder="e.g., 20000"><br>
 
-    <label for="monthlyIncome">Monthly Income After Expenses (in dollars):</label><br>
+    <label for="monthlyIncome">Monthly Income After Expenses (in euros):</label><br>
     <input type="number" id="monthlyIncome" placeholder="e.g., 500"><br><br>
 
     <button onclick="calculateDream()">Calculate</button>
@@ -50,25 +50,35 @@
 
     <script>
         function calculateDream() {
-            let dreamPrice = document.getElementById('dreamPrice').value;
-            let monthlyIncome = document.getElementById('monthlyIncome').value;
-            let resultDiv = document.getElementById('result');
-            let boosterLinkDiv = document.getElementById('boosterLink');
+            const dreamPrice = parseFloat(document.getElementById('dreamPrice').value);
+            const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value);
+            const dreamTitle = document.getElementById('dreamTitle').value;
+            const resultDiv = document.getElementById('result');
+            const boosterLinkDiv = document.getElementById('boosterLink');
 
-            // Calculate the number of months
-            if (dreamPrice && monthlyIncome) {
-                let monthsRequired = dreamPrice / monthlyIncome;
-                if (monthsRequired <= 12) {
-                    resultDiv.innerHTML = `You can achieve your dream in ${Math.round(monthsRequired)} months.`;
-                    boosterLinkDiv.innerHTML = '';
-                } else {
-                    let years = (monthsRequired / 12).toFixed(2);
-                    resultDiv.innerHTML = `You will need ${Math.round(monthsRequired)} months (${years} years) to achieve your dream.`;
-                    boosterLinkDiv.innerHTML = 'Want to get it faster? <a href="booster.html">Get it faster HERE</a>';
-                }
-            } else {
+            // Ensure input validation
+            if (!dreamPrice || !monthlyIncome || !dreamTitle) {
                 resultDiv.innerHTML = 'Please fill in all fields.';
                 boosterLinkDiv.innerHTML = '';
+                return;
+            }
+
+            // Calculate the number of months
+            const monthsRequired = dreamPrice / monthlyIncome;
+
+            // Save the values to localStorage so we can access them on the next page
+            localStorage.setItem('dreamTitle', dreamTitle);
+            localStorage.setItem('dreamPrice', dreamPrice);
+            localStorage.setItem('monthlyIncome', monthlyIncome);
+            localStorage.setItem('monthsRequired', monthsRequired);
+
+            if (monthsRequired <= 12) {
+                resultDiv.innerHTML = `You can achieve your dream in ${Math.round(monthsRequired)} months.`;
+                boosterLinkDiv.innerHTML = '';
+            } else {
+                const years = (monthsRequired / 12).toFixed(2);
+                resultDiv.innerHTML = `You will need ${Math.round(monthsRequired)} months (${years} years) to achieve your dream.`;
+                boosterLinkDiv.innerHTML = 'Want to get it faster? <a href="booster.html">Get it faster HERE</a>';
             }
         }
     </script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booster Page</title>
+    <title>Get Your Dream</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,26 +32,30 @@
 </head>
 <body>
 
-    <h1>Boost Your Dream</h1>
+    <h1>Get Your "<span id="dreamTitle"></span>"</h1>
+
+    <p>Your monthly income after expenses is: <strong id="monthlyIncomeText"></strong> euros</p>
 
     <label><input type="checkbox" id="bankAccount"> Put money in a bank account</label><br>
     <div id="bankDetails" style="display: none;">
         Interest Rate (%): <input type="number" id="bankInterest" placeholder="e.g., 1.5"><br>
+        Amount allocated to bank investment (€): <input type="number" id="bankAllocation" placeholder="e.g., 100"><br>
     </div>
 
-    <label><input type="checkbox" id="investmentAccount"> Put money in an investment account</label><br>
+    <label><input type="checkbox" id="investmentAccount"> Put money in an investment account (stocks)</label><br>
     <div id="investmentDetails" style="display: none;">
         Rate of Return (%): <input type="number" id="investmentReturn" placeholder="e.g., 7"><br>
+        Amount allocated to stock investment (€): <input type="number" id="investmentAllocation" placeholder="e.g., 200"><br>
     </div>
 
     <label><input type="checkbox" id="secondJob"> Get another job</label><br>
     <div id="jobDetails" style="display: none;">
-        Additional Monthly Income ($): <input type="number" id="additionalIncome" placeholder="e.g., 300"><br>
+        Additional Monthly Income (€): <input type="number" id="additionalIncome" placeholder="e.g., 300"><br>
     </div>
 
     <label><input type="checkbox" id="business"> Start a business</label><br>
     <div id="businessDetails" style="display: none;">
-        Expected Monthly Profit ($): <input type="number" id="businessProfit" placeholder="e.g., 1000"><br>
+        Expected Monthly Profit (€): <input type="number" id="businessProfit" placeholder="e.g., 1000"><br>
     </div>
 
     <button onclick="calculateBoost()">Go</button>
@@ -59,6 +63,16 @@
     <div class="result" id="boostResult"></div>
 
     <script>
+        // Get values from localStorage
+        const dreamTitle = localStorage.getItem('dreamTitle');
+        const dreamPrice = parseFloat(localStorage.getItem('dreamPrice'));
+        const monthlyIncome = parseFloat(localStorage.getItem('monthlyIncome'));
+        const originalMonthsRequired = parseFloat(localStorage.getItem('monthsRequired'));
+
+        // Display dream title and income in the header
+        document.getElementById('dreamTitle').innerText = dreamTitle;
+        document.getElementById('monthlyIncomeText').innerText = monthlyIncome;
+
         // Toggle visibility of additional fields based on checkboxes
         document.getElementById('bankAccount').addEventListener('change', function() {
             document.getElementById('bankDetails').style.display = this.checked ? 'block' : 'none';
@@ -77,26 +91,47 @@
         });
 
         function calculateBoost() {
-            let originalMonths = 36;  // Placeholder, should come from the previous calculation.
+            let totalEarnings = 0;
 
-            let additionalIncome = 0;
+            // Bank investment calculation (if selected)
             if (document.getElementById('bankAccount').checked) {
-                let bankInterest = document.getElementById('bankInterest').value;
-                additionalIncome += originalMonths * bankInterest / 100;
-            }
-            if (document.getElementById('investmentAccount').checked) {
-                let investmentReturn = document.getElementById('investmentReturn').value;
-                additionalIncome += originalMonths * investmentReturn / 100;
-            }
-            if (document.getElementById('secondJob').checked) {
-                additionalIncome += parseFloat(document.getElementById('additionalIncome').value) || 0;
-            }
-            if (document.getElementById('business').checked) {
-                additionalIncome += parseFloat(document.getElementById('businessProfit').value) || 0;
+                const bankInterest = parseFloat(document.getElementById('bankInterest').value) || 0;
+                const bankAllocation = parseFloat(document.getElementById('bankAllocation').value) || 0;
+                
+                totalEarnings += bankAllocation * (bankInterest / 100) * (originalMonthsRequired / 12);
             }
 
-            let reducedMonths = originalMonths - (additionalIncome / 100);  // Simplified calculation.
-            document.getElementById('boostResult').innerHTML = `With the boost, you can achieve your dream in ${Math.max(1, Math.round(reducedMonths))} months instead of ${originalMonths} months!`;
+            // Stock investment calculation (if selected)
+            if (document.getElementById('investmentAccount').checked) {
+                const investmentReturn = parseFloat(document.getElementById('investmentReturn').value) || 0;
+                const investmentAllocation = parseFloat(document.getElementById('investmentAllocation').value) || 0;
+                
+                totalEarnings += investmentAllocation * (investmentReturn / 100) * (originalMonthsRequired / 12);
+            }
+
+            // Additional job income (if selected)
+            if (document.getElementById('secondJob').checked) {
+                const additionalIncome = parseFloat(document.getElementById('additionalIncome').value) || 0;
+                totalEarnings += additionalIncome * originalMonthsRequired;
+            }
+
+            // Business profit (if selected)
+            if (document.getElementById('business').checked) {
+                const businessProfit = parseFloat(document.getElementById('businessProfit').value) || 0;
+                totalEarnings += businessProfit * originalMonthsRequired;
+            }
+
+            // Calculate new time to achieve dream based on total earnings
+            const newTotalIncome = monthlyIncome + (totalEarnings / originalMonthsRequired); 
+            const reducedMonthsRequired = dreamPrice / newTotalIncome;
+
+            // Display result
+            const boostResultDiv = document.getElementById('boostResult');
+            boostResultDiv.innerHTML = `
+                With your boost, you can now achieve your dream in ${Math.round(reducedMonthsRequired)} months 
+                instead of ${Math.round(originalMonthsRequired)} months!<br>
+                You earned an additional €${totalEarnings.toFixed(2)} from your investments.
+            `;
         }
     </script>
 
