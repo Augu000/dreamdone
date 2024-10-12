@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Taupymo skaičiuoklė</title>
+    <style>
+        #noriu_greiciau {
+            display: none;
+        }
+        @keyframes colorChange {
+            0% { background-color: yellow; }
+            50% { background-color: lightblue; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Taupymo skaičiuoklė</h1>
+
+    <label for="pradines_santaupos">Pradinės santaupos:</label>
+    <input type="number" step="0.01" id="pradines_santaupos" required>
+    <br>
+
+    <label for="menesinis_atlyginimas">Mėnesinis atlyginimas:</label>
+    <input type="number" step="0.01" id="menesinis_atlyginimas" min="0" required>
+    <br>
+
+    <label for="siekiama_suma">Siekiama sutaupyti:</label>
+    <input type="number" step="0.01" id="siekiama_suma" min="0" required>
+    <br>
+
+    <button onclick="skaiciuoti()">Skaičiuoti</button>
+
+    <p id="rezultatas"></p>
+
+    <div id="noriu_greiciau">
+        <h2>Nori sužinoti, kaip greičiau?</h2>
+        <p>Spustelk čia: <a id="link_to_next" href="#">Play</a></p>
+    </div>
+
+    <script>
+        function skaiciuoti() {
+            const pradineSuma = parseFloat(document.getElementById('pradines_santaupos').value);
+            const menesinisAtlyginimas = parseFloat(document.getElementById('menesinis_atlyginimas').value);
+            const siekiamaSuma = parseFloat(document.getElementById('siekiama_suma').value);
+
+            if (menesinisAtlyginimas <= 0 || siekiamaSuma <= 0) {
+                alert("Mėnesinis atlyginimas turi būti didesnis už nulį, o siekiama suma turi būti didesnė už nulį.");
+                return;
+            }
+
+            let menesiai = Math.ceil((siekiamaSuma - pradineSuma) / menesinisAtlyginimas);
+            const metai = Math.floor(menesiai / 12);
+            const likusiosMenesiai = menesiai % 12;
+
+            let rezultatas = 'Reikia maždaug ';
+            if (metai > 0) {
+                rezultatas += `${metai} metų`;
+            }
+            if (likusiosMenesiai > 0) {
+                if (metai > 0) rezultatas += ` ir `;
+                rezultatas += `${likusiosMenesiai} mėnesių`;
+            }
+            if (metai === 0 && likusiosMenesiai === 0) {
+                rezultatas += `1 mėnesio`; 
+            }
+
+            rezultatas += `, kad sutaupytumėte norimą sumą.`;
+
+            document.getElementById('rezultatas').textContent = rezultatas;
+            document.getElementById('noriu_greiciau').style.display = 'block';
+
+            const link = document.getElementById('link_to_next');
+            link.href = `trecias_psl.html?pradines_santaupos=${encodeURIComponent(pradineSuma)}&menesinis_atlyginimas=${encodeURIComponent(menesinisAtlyginimas)}&siekiama_suma=${encodeURIComponent(siekiamaSuma)}&pradine_trukme=${encodeURIComponent(menesiai)}`;
+        }
+    </script>
+</body>
+</html>
