@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trečias puslapis</title>
+    <style>
+        body {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+        }
+        #data_table_container {
+            position: relative;
+            width: 40%;
+            right: 0;
+            top: 20px;
+        }
+        #data_table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #data_table td, #data_table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        #data_table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        #form_section {
+            width: 40%;
+            margin-right: auto;
+        }
+
+        /* Dropdown for job list */
+        #job_dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        #jobs_list {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ddd;
+            z-index: 1;
+            width: 400%; /* Make the job list 4 times wider */
+        }
+        .job-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .job-item:last-child {
+            border-bottom: none;
+        }
+        .job-item span {
+            cursor: pointer;
+            color: red;
+            margin-left: 20px;
+        }
+        #new_job_input, #new_job_value {
+            width: 70%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        #jobs_list input {
+            margin-top: 10px;
+        }
+        /* Show the job list when hovering */
+        #job_dropdown:hover #jobs_list {
+            display: block;
+        }
+        /* Style for the buttons */
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Form section on the left -->
+    <div id="form_section">
+        <h2>Investicijų ir išlaidų įvedimas</h2>
+        <form id="investment_form">
+            <label for="investment_account">Investuoti į investicinę sąskaitą (EUR):</label>
+            <input type="number" step="0.01" id="investment_account" name="investment_account" placeholder="Pvz.: 100.00">
+            <br><br>
+
+            <label for="stock_investment">Investuoti į akcijas (EUR):</label>
+            <input type="number" step="0.01" id="stock_investment" name="stock_investment" placeholder="Pvz.: 50.00">
+            <br><br>
+
+            <label for="kitos_islaidos">Kitos išlaidos (EUR):</label>
+            <input type="number" step="0.01" id="kitos_islaidos" name="kitos_islaidos" placeholder="Pvz.: 200.00">
+            <br><br>
+
+            <label for="padienis_men_uzd">Padienis mėnesio uždarbis (EUR):</label>
+            <input type="number" step="0.01" id="padienis_men_uzd" name="padienis_men_uzd" placeholder="Pvz.: 0.00">
+            <br><br>
+
+            <button type="button" onclick="updateInvestments()">Atnaujinti</button>
+        </form>
+
+        <!-- Job list section -->
+        <div id="job_dropdown">
+            <h3>Darbai</h3>
+            <div id="jobs_list">
+                <div id="jobs"></div>
+                <input type="text" id="new_job_input" placeholder="Įveskite naują darbą">
+                <input type="number" id="new_job_value" placeholder="Vertė EUR" step="0.01" min="0"> <!-- No negative numbers -->
+                <button onclick="addJob()">+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container for the table and the button -->
+    <div id="data_table_container">
+        <!-- Table for displaying additional information -->
+        <table id="data_table">
+            <tr>
+                <th>Kintamasis</th>
+                <th>Reikšmė</th>
+            </tr>
+            <tr>
+                <td>Balansas</td>
+                <td id="balansas"></td>
+            </tr>
+            <tr>
+                <td>Mėnesinės įplaukos</td>
+                <td id="menesine_alga"></td>
+            </tr>
+            <tr>
+                <td>Numatomas sutaupytas laikas</td>
+                <td id="sutaupytas_laikas"></td>
+            </tr>
+            <tr>
+                <td>Praėjęs laikas</td>
+                <td id="praejes_laikas"></td>
+            </tr>
+            <tr>
+                <td>Investicijos</td>
+                <td id="investicijos"></td>
+            </tr>
+            <tr>
+                <td>Akcijos</td>
+                <td id="akcijos"></td>
+            </tr>
+            <tr>
+                <td>Verslas</td>
+                <td id="verslas"></td>
+            </tr>
+            <tr>
+                <td>Padienis mėnesio uždarbis</td>
+                <td id="padienis_uzdarbis"></td>
+            </tr>
+        </table>
+
+        <!-- "Kitas mėnesis" button below the table -->
+        <div style="margin-top: 20px; text-align: right;">
+            <button type="button" onclick="nextMonth()">Kitas mėnesis</button>
+        </div>
+    </div>
+
+    <script>
+        // Retrieve parameters from URL sent by "pirmas_psl.html"
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // New variables based on the parameters received from "pirmas_psl.html"
+        let pradinesSantaupos = parseFloat(urlParams.get('pradines_santaupos'));
+        const menesinisAtlyginimas = parseFloat(urlParams.get('menesinis_atlyginimas'));
+        const siekiamaSuma = parseFloat(urlParams.get('siekiama_suma'));
+        const pradineTrukme = parseFloat(urlParams.get('pradine_trukme'));
+
+        // New variables
+        let praejesLaikas = 0;
+        let investicijos = 0;
+        let akcijos = 0;
+        let verslas = 0;
+        let padienis_men_uzd = 0; // Default value
+
+        // Temporary variables for new user-entered investments and stock investments
+        let naujosInvesticijos = 0;
+        let naujosAkcijos = 0;
+
+        // Initialize monthly expenses and other expenses
+        let menesio_islaidos = 0;
+        let kitos_islaidos = 0;
+
+        // Initialize an array called "drabai" with the first element as "Pradinės įplaukos" and its value
+        let drabai = [{name: "Pradinės įplaukos", value: menesinisAtlyginimas.toFixed(2)}];
+
+        // Set initial values for balance and monthly income
+        let balansas = pradinesSantaupos;
+        const menesineAlga = menesinisAtlyginimas;
+
+        // Calculate "Sutaupytas laikas" (difference between pradine_trukme and nauja_trukme)
+        const naujaTrukme = pradineTrukme;
+        const sutaupytasLaikas = pradineTrukme - naujaTrukme;
+
+        // Display the calculated values in the table
+        function updateBudgetDisplay() {
+            const realBalance = balansas - (menesio_islaidos + kitos_islaidos); // New balance after expenses
+            document.getElementById('balansas').textContent = `${realBalance.toFixed(2)} EUR`;
+        }
+
+        // Update table when script runs
+        updateBudgetDisplay();
+        document.getElementById('sutaupytas_laikas').textContent = `${sutaupytasLaikas.toFixed(2)} mėnesiai`;
+        document.getElementById('padienis_uzdarbis').textContent = `${padienis_men_uzd.toFixed(2)} EUR`;
+
+        // Display the new variables
+        document.getElementById('praejes_laikas').textContent = `${praejesLaikas} mėnesiai`;
+        document.getElementById('investicijos').textContent = `${(investicijos + naujosInvesticijos).toFixed(2)} EUR`; // Display combined investments
+        document.getElementById('akcijos').textContent = `${(akcijos + naujosAkcijos).toFixed(2)} EUR`; // Display combined stocks
+        document.getElementById('verslas').textContent = `${verslas.toFixed(2)} EUR`;
+
+        // Function to update the displayed monthly income (Mėnesinės įplaukos)
+        function updateMonthlyIncome() {
+            const totalIncome = drabai.reduce((sum, job) => sum + parseFloat(job.value), 0);
+            document.getElementById('menesine_alga').textContent = `${totalIncome.toFixed(2)} EUR`;
+        }
+
+        // Function to update investments and expenses
+        function updateInvestments() {
+
+            // Get the input values for investments, stocks, other expenses, and padienis_men_uzd
+            const investmentInput = parseFloat(document.getElementById('investment_account').value) || 0;
+            const stockInput = parseFloat(document.getElementById('stock_investment').value) || 0;
+
+            // Update monthly expenses with the sum of investments, stocks, and other expenses
+            menesio_islaidos = investmentInput + stockInput;
+
+            // Check if monthly expenses exceed the balance before applying changes
+            if ((menesio_islaidos + kitos_islaidos) > balansas) {
+                alert("Nepakanka lėšų");
+                return;
+            }
+            else{
+                kitos_islaidos = parseFloat(document.getElementById('kitos_islaidos').value) || 0;
+                padienis_men_uzd = parseFloat(document.getElementById('padienis_men_uzd').value) || 0;
+
+                // Add the user-entered investment and stock to the temporary variables
+                naujosInvesticijos = investmentInput;
+                naujosAkcijos = stockInput;
+
+                // Update displayed padienis_men_uzd
+                document.getElementById('padienis_uzdarbis').textContent = `${padienis_men_uzd.toFixed(2)} EUR`;
+
+                // Update the displayed values for investments and stocks without modifying actual "investicijos" and "akcijos"
+                document.getElementById('investicijos').textContent = `${(investicijos + naujosInvesticijos).toFixed(2)} EUR`;
+                document.getElementById('akcijos').textContent = `${(akcijos + naujosAkcijos).toFixed(2)} EUR`;
+
+                // Update budget display after user enters investments/expenses
+                updateBudgetDisplay();
+            }
+        }
+
+        // Function for "Kitas mėnesis"
+        function nextMonth() {
+            // First, call updateInvestments before proceeding
+            updateInvestments();
+
+            // Then continue with nextMonth logic only if investments update is successful
+            if ((menesio_islaidos + kitos_islaidos) > balansas) {
+                alert("Nepakanka lėšų");
+                return;
+            }
+            else{
+                // Apply the temporary investment and stock to the actual values
+                investicijos += naujosInvesticijos;
+                akcijos += naujosAkcijos;
+
+                // Subtract monthly expenses and reset them
+                balansas -= (menesio_islaidos + kitos_islaidos);
+                menesio_islaidos = 0;
+                kitos_islaidos = 0;
+
+                // Update padienis_men_uzd, akcijos, and investments
+                investicijos *= Math.pow(1.02, 1 / 12);  // Investments grow by 2% annually, adjusted for monthly
+
+                // Add monthly earnings to the balance
+                const totalIncome = drabai.reduce((sum, job) => sum + parseFloat(job.value), 0);
+                verslas = totalIncome;
+                balansas += padienis_men_uzd + akcijos*0.05 + totalIncome;
+
+                // Update praėjęs laikas
+                praejesLaikas += 1; // Add 1 month
+                document.getElementById('praejes_laikas').textContent = `${praejesLaikas} mėnesiai`;
+
+                // Update the displayed values
+                document.getElementById('akcijos').textContent = `${akcijos.toFixed(2)} EUR`;
+                document.getElementById('padienis_uzdarbis').textContent = `${padienis_men_uzd.toFixed(2)} EUR`;
+                document.getElementById('investicijos').textContent = `${investicijos.toFixed(2)} EUR`;
+
+                // Reset the form fields
+                document.getElementById('investment_account').value = '';
+                document.getElementById('stock_investment').value = '';
+                document.getElementById('kitos_islaidos').value = '';
+                naujosInvesticijos = 0;  // Reset the new investment
+                naujosAkcijos = 0;  // Reset the new stock investment
+
+                // Update budget display after month passes
+                updateBudgetDisplay();
+            }
+        }
+
+        // Function to render the job list
+        function renderJobList() {
+            const jobsDiv = document.getElementById('jobs');
+            jobsDiv.innerHTML = ''; // Clear the current list
+
+            drabai.forEach((job, index) => {
+                const jobElement = document.createElement('div');
+                jobElement.classList.add('job-item');
+                jobElement.innerHTML = `${job.name} <span>${job.value} EUR</span> <span onclick="confirmRemoveJob(${index})">x</span>`;
+                jobsDiv.appendChild(jobElement);
+            });
+
+            updateMonthlyIncome(); // Update monthly income whenever the job list is updated
+        }
+
+        // Function to remove a job with confirmation
+        function confirmRemoveJob(index) {
+            const confirmRemoval = confirm("Ar tikrai norite pašalinti šitą darbą?");
+            if (confirmRemoval) {
+                removeJob(index);
+            }
+        }
+
+        // Function to remove a job from the list
+        function removeJob(index) {
+            drabai.splice(index, 1); // Remove job from the array
+            renderJobList(); // Re-render the list
+        }
+
+        // Function to add a new job
+        function addJob() {
+            const newJob = document.getElementById('new_job_input').value.trim();
+            const newJobValue = Math.max(0, parseFloat(document.getElementById('new_job_value').value)).toFixed(2) || '0.00'; // Ensure non-negative value
+
+            if (newJob) {
+                drabai.push({name: newJob, value: newJobValue}); // Add new job to the array
+                document.getElementById('new_job_input').value = ''; // Clear the input field
+                document.getElementById('new_job_value').value = ''; // Clear the value field
+                renderJobList(); // Re-render the list
+            }
+        }
+
+        // Initial render of the job list
+        renderJobList();
+    </script>
+</body>
+</html>
