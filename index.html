@@ -1,76 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Taupymo skaičiuoklė</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dream Calculator</title>
     <style>
-        #noriu_greiciau {
-            display: none;
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
         }
-        @keyframes colorChange {
-            0% { background-color: yellow; }
-            50% { background-color: lightblue; }
+        input[type="text"], input[type="number"] {
+            width: 200px;
+            padding: 8px;
+            margin: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result, .booster-link {
+            margin-top: 20px;
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
-    <h1>Taupymo skaičiuoklė</h1>
 
-    <label for="pradines_santaupos">Pradinės santaupos:</label>
-    <input type="number" step="0.01" id="pradines_santaupos" required>
-    <br>
+    <h1>Achieve Your Financial Dreams</h1>
+    
+    <label for="dreamTitle">Dream Title:</label><br>
+    <input type="text" id="dreamTitle" placeholder="e.g., Buy a car"><br>
 
-    <label for="menesinis_atlyginimas">Mėnesinis atlyginimas:</label>
-    <input type="number" step="0.01" id="menesinis_atlyginimas" min="0" required>
-    <br>
+    <label for="dreamPrice">Dream Price (in dollars):</label><br>
+    <input type="number" id="dreamPrice" placeholder="e.g., 20000"><br>
 
-    <label for="siekiama_suma">Siekiama sutaupyti:</label>
-    <input type="number" step="0.01" id="siekiama_suma" min="0" required>
-    <br>
+    <label for="monthlyIncome">Monthly Income After Expenses (in dollars):</label><br>
+    <input type="number" id="monthlyIncome" placeholder="e.g., 500"><br><br>
 
-    <button onclick="skaiciuoti()">Skaičiuoti</button>
+    <button onclick="calculateDream()">Calculate</button>
 
-    <p id="rezultatas"></p>
-
-    <div id="noriu_greiciau">
-        <h2>Nori sužinoti, kaip greičiau?</h2>
-        <p>Spustelk čia: <a id="link_to_next" href="./skaiciuokle.html">Play</a></p>
-    </div>
+    <div class="result" id="result"></div>
+    <div class="booster-link" id="boosterLink"></div>
 
     <script>
-        function skaiciuoti() {
-            const pradineSuma = parseFloat(document.getElementById('pradines_santaupos').value);
-            const menesinisAtlyginimas = parseFloat(document.getElementById('menesinis_atlyginimas').value);
-            const siekiamaSuma = parseFloat(document.getElementById('siekiama_suma').value);
+        function calculateDream() {
+            let dreamPrice = document.getElementById('dreamPrice').value;
+            let monthlyIncome = document.getElementById('monthlyIncome').value;
+            let resultDiv = document.getElementById('result');
+            let boosterLinkDiv = document.getElementById('boosterLink');
 
-            if (menesinisAtlyginimas <= 0 || siekiamaSuma <= 0) {
-                alert("Mėnesinis atlyginimas turi būti didesnis už nulį, o siekiama suma turi būti didesnė už nulį.");
-                return;
+            // Calculate the number of months
+            if (dreamPrice && monthlyIncome) {
+                let monthsRequired = dreamPrice / monthlyIncome;
+                if (monthsRequired <= 12) {
+                    resultDiv.innerHTML = `You can achieve your dream in ${Math.round(monthsRequired)} months.`;
+                    boosterLinkDiv.innerHTML = '';
+                } else {
+                    let years = (monthsRequired / 12).toFixed(2);
+                    resultDiv.innerHTML = `You will need ${Math.round(monthsRequired)} months (${years} years) to achieve your dream.`;
+                    boosterLinkDiv.innerHTML = 'Want to get it faster? <a href="booster.html">Get it faster HERE</a>';
+                }
+            } else {
+                resultDiv.innerHTML = 'Please fill in all fields.';
+                boosterLinkDiv.innerHTML = '';
             }
-
-            let menesiai = Math.ceil((siekiamaSuma - pradineSuma) / menesinisAtlyginimas);
-            const metai = Math.floor(menesiai / 12);
-            const likusiosMenesiai = menesiai % 12;
-
-            let rezultatas = 'Reikia maždaug ';
-            if (metai > 0) {
-                rezultatas += `${metai} metų`;
-            }
-            if (likusiosMenesiai > 0) {
-                if (metai > 0) rezultatas += ` ir `;
-                rezultatas += `${likusiosMenesiai} mėnesių`;
-            }
-            if (metai === 0 && likusiosMenesiai === 0) {
-                rezultatas += `1 mėnesio`; 
-            }
-
-            rezultatas += `, kad sutaupytumėte norimą sumą.`;
-
-            document.getElementById('rezultatas').textContent = rezultatas;
-            document.getElementById('noriu_greiciau').style.display = 'block';
-
-            const link = document.getElementById('link_to_next');
-            link.href = `skaiciuokle.html?pradines_santaupos=${encodeURIComponent(pradineSuma)}&menesinis_atlyginimas=${encodeURIComponent(menesinisAtlyginimas)}&siekiama_suma=${encodeURIComponent(siekiamaSuma)}&pradine_trukme=${encodeURIComponent(menesiai)}`;
         }
     </script>
+
 </body>
 </html>
