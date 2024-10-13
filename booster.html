@@ -46,6 +46,15 @@
             opacity: 0;
             animation: fadeIn 1s forwards;
         }
+        .link-placeholder {
+            margin-top: 5px;
+            display: none;
+            margin-bottom: 20px;
+        }
+        .go_link{
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
@@ -57,24 +66,36 @@
     <label><input type="checkbox" id="bankAccount"> Put money in a bank account</label><br>
     <div id="bankDetails" style="display: none;">
         Profit from bank account (€): <input type="number" id="bankProfit" placeholder="e.g., 100"><br>
+        <div class="link-placeholder" id="bankLink">
+            <a href="https://example-bank.com" target="_blank">Go to Bank Account Info</a>
+        </div>
     </div>
 
     <label><input type="checkbox" id="investmentAccount"> Put money in an investment account (stocks)</label><br>
     <div id="investmentDetails" style="display: none;">
         Profit from investment account (€): <input type="number" id="investmentProfit" placeholder="e.g., 200"><br>
+        <div class="link-placeholder" id="investmentLink">
+            <a href="https://example-investment.com" target="_blank">Learn About Investment</a>
+        </div>
     </div>
 
     <label><input type="checkbox" id="secondJob"> Get another job</label><br>
     <div id="jobDetails" style="display: none;">
         Additional Monthly Income (€): <input type="number" id="additionalIncome" placeholder="e.g., 300"><br>
+        <div class="link-placeholder" id="jobLink">
+            <a href="https://example-jobsite.com" target="_blank">Find Jobs</a>
+        </div>
     </div>
 
     <label><input type="checkbox" id="business"> Start a business</label><br>
     <div id="businessDetails" style="display: none;">
         Expected Monthly Profit (€): <input type="number" id="businessProfit" placeholder="e.g., 1000"><br>
+        <div class="link-placeholder" id="businessLink">
+            <a href="https://example-business.com" target="_blank">Start Your Business</a>
+        </div>
     </div>
 
-    <button onclick="calculateBoost()">Go</button>
+    <button onclick="calculateBoost()" class="go_link">Go</button>
 
     <div class="result fade-in" id="boostResult"></div>
     <footer>© 2024 DreamDone. All rights reserved.</footer>
@@ -90,21 +111,25 @@
         document.getElementById('dreamTitle').innerText = dreamTitle;
         document.getElementById('monthlyIncomeText').innerText = monthlyIncome;
 
-        // Toggle visibility of additional fields based on checkboxes
+        // Toggle visibility of additional fields and links based on checkboxes
         document.getElementById('bankAccount').addEventListener('change', function() {
             document.getElementById('bankDetails').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('bankLink').style.display = this.checked ? 'block' : 'none';
         });
 
         document.getElementById('investmentAccount').addEventListener('change', function() {
             document.getElementById('investmentDetails').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('investmentLink').style.display = this.checked ? 'block' : 'none';
         });
 
         document.getElementById('secondJob').addEventListener('change', function() {
             document.getElementById('jobDetails').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('jobLink').style.display = this.checked ? 'block' : 'none';
         });
 
         document.getElementById('business').addEventListener('change', function() {
             document.getElementById('businessDetails').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('businessLink').style.display = this.checked ? 'block' : 'none';
         });
 
         function calculateBoost() {
