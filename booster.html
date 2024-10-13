@@ -73,7 +73,7 @@
     <div id="bankDetails" style="display: none;">
         Profit from bank account (€): <input type="number" id="bankProfit" placeholder="e.g., 100" min="0"><br>
         <div class="link-placeholder" id="bankLink">
-            <a href="https://example-bank.com" target="_blank">Go to Bank Account Info</a>
+            <a href="https://www.revolut.com/" target="_blank">Go to Bank Account Info</a>
         </div>
     </div>
 
@@ -81,7 +81,7 @@
     <div id="investmentDetails" style="display: none;">
         Profit from investment account (€): <input type="number" id="investmentProfit" placeholder="e.g., 200" min="0"><br>
         <div class="link-placeholder" id="investmentLink">
-            <a href="https://example-investment.com" target="_blank">Learn About Investment</a>
+            <a href="https://www.trading212.com/?utm_campaign=EU%20-%20Brand%20protection&c=EU%20-%20Brand%20protection&utm_content=Brand%20General&af_adset=Brand%20General&utm_medium=google_search&utm_source=google&utm_term=trading212&match_type=e&campaign_id=17170785268&af_c_id=17170785268&ad_group_id=137307334078&af_adset_id=137307334078&device=c&position=&gad_source=1&gclid=CjwKCAjw3624BhBAEiwAkxgTOjQI-tMIcg_wxlPocl9R4a2155BzNeEzAAB4LarWU373eo2Klby0ZBoCTGoQAvD_BwE" target="_blank">Learn About Investment</a>
         </div>
     </div>
 
@@ -89,7 +89,7 @@
     <div id="jobDetails" style="display: none;">
         Additional Monthly Income (€): <input type="number" id="additionalIncome" placeholder="e.g., 300" min="0"><br>
         <div class="link-placeholder" id="jobLink">
-            <a href="https://example-jobsite.com" target="_blank">Find Jobs</a>
+            <a href="https://www.cvonline.lt/lt?gad_source=1&gbraid=0AAAAADCHRaYxY8iPaISGFRFeTP57Nj-ud&gclid=CjwKCAjw3624BhBAEiwAkxgTOo9DLf45eklQXtTlEcGPUERBpOXtbu3J_dBEwVTP66MV2yJNNmZ0GRoC0CUQAvD_BwE" target="_blank">Find Jobs</a>
         </div>
     </div>
 
@@ -97,7 +97,24 @@
     <div id="businessDetails" style="display: none;">
         Expected Monthly Profit (€): <input type="number" id="businessProfit" placeholder="e.g., 1000" min="0"><br>
         <div class="link-placeholder" id="businessLink">
-            <a href="https://example-business.com" target="_blank">Start Your Business</a>
+            <a href="https://inovacijuagentura.lt/finansavimo-kvietimai?lang=lt&gad_source=1&gclid=CjwKCAjw3624BhBAEiwAkxgTOnQicVjsciMQw5jCtddg5tvfDNBL8ogCaoFnR5qGhD18eYGqtlI9WRoCJ_4QAvD_BwE" target="_blank">Start Your Business</a>
+        </div>
+    </div>
+
+    <!-- New Checkboxes and Links -->
+    <label><input type="checkbox" id="rentCar"> Rent your car</label><br>
+    <div id="rentCarDetails" style="display: none;">
+        Profit from renting your car (€): <input type="number" id="carProfit" placeholder="e.g., 150" min="0"><br>
+        <div class="link-placeholder" id="rentCarLink">
+            <a href="https://woopdrive.com/car-sharing" target="_blank">Rent your car HERE</a>
+        </div>
+    </div>
+
+    <label><input type="checkbox" id="rentItems"> Rent unused items</label><br>
+    <div id="rentItemsDetails" style="display: none;">
+        Profit from renting unused items (€): <input type="number" id="itemsProfit" placeholder="e.g., 50" min="0"><br>
+        <div class="link-placeholder" id="rentItemsLink">
+            <a href="https://www.dalinuosi.lt" target="_blank">Rent your items HERE</a>
         </div>
     </div>
 
@@ -137,6 +154,17 @@
         document.getElementById('business').addEventListener('change', function() {
             document.getElementById('businessDetails').style.display = this.checked ? 'block' : 'none';
             document.getElementById('businessLink').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Toggle visibility for the new checkboxes
+        document.getElementById('rentCar').addEventListener('change', function() {
+            document.getElementById('rentCarDetails').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('rentCarLink').style.display = this.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('rentItems').addEventListener('change', function() {
+            document.getElementById('rentItemsDetails').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('rentItemsLink').style.display = this.checked ? 'block' : 'none';
         });
 
         function calculateBoost() {
@@ -188,6 +216,28 @@
                     return;
                 }
                 totalEarnings += businessProfit * originalMonthsRequired;
+            }
+
+            // Rent car profit (if selected)
+            if (document.getElementById('rentCar').checked) {
+                const carProfitInput = document.getElementById('carProfit').value;
+                const carProfit = parseFloat(carProfitInput);
+                if (isNaN(carProfit) || carProfit < 0) {
+                    errorMsg.innerHTML = 'Please enter a positive number for car rental profit.';
+                    return;
+                }
+                totalEarnings += carProfit * originalMonthsRequired;
+            }
+
+            // Rent items profit (if selected)
+            if (document.getElementById('rentItems').checked) {
+                const itemsProfitInput = document.getElementById('itemsProfit').value;
+                const itemsProfit = parseFloat(itemsProfitInput);
+                if (isNaN(itemsProfit) || itemsProfit < 0) {
+                    errorMsg.innerHTML = 'Please enter a positive number for items rental profit.';
+                    return;
+                }
+                totalEarnings += itemsProfit * originalMonthsRequired;
             }
 
             // Ensure totalEarnings is not zero to prevent division by zero
