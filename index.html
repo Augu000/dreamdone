@@ -62,7 +62,7 @@
     <label for="dreamPrice">Dream Price (in euros):</label><br>
     <input type="number" id="dreamPrice" placeholder="e.g., 20000" min="0"><br>
 
-    <label for="monthlyIncome">Monthly Income After Expenses (in euros):</label><br>
+    <label for="monthlyIncome">Monthly Savings (in euros):</label><br>
     <input type="number" id="monthlyIncome" placeholder="e.g., 500" min="0"><br><br>
 
     <button onclick="calculateDream()">Calculate</button>
@@ -115,13 +115,19 @@
             setTimeout(() => {
                 resultDiv.classList.add('fade-in');
                 boosterLinkDiv.classList.add('fade-in');
+                
+                if (Math.round(monthsRequired) < monthsRequired) {
+                    monthsRequired1 = Math.round(monthsRequired)+1
+                } else {
+                    monthsRequired1 = Math.round(monthsRequired)
+                }
 
                 if (monthsRequired <= 12) {
-                    resultDiv.innerHTML = `You can achieve your dream in ${Math.round(monthsRequired)} months.`;
+                    resultDiv.innerHTML = `You can achieve your dream in ${Math.round(monthsRequired1)} months.`;
                     boosterLinkDiv.innerHTML = '';
                 } else {
                     const years = (monthsRequired / 12).toFixed(2);
-                    resultDiv.innerHTML = `You will need ${Math.round(monthsRequired)} months (${years} years) to achieve your dream.`;
+                    resultDiv.innerHTML = `You will need ${monthsRequired1} months (${years} years) to achieve your dream.`;
                     boosterLinkDiv.innerHTML = 'Want to get it faster? <a href="booster.html">Get it faster HERE</a>';
                 }
             }, 0);
