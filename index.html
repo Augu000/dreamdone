@@ -6,20 +6,27 @@
     <title>Financial Dream Calculator</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
         }
         input[type="text"], input[type="number"] {
-            width: 200px;
-            padding: 8px;
-            margin: 5px;
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         button {
-            padding: 10px 15px;
+            padding: 10px 20px;
             background-color: #28a745;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         button:hover {
             background-color: #218838;
@@ -27,6 +34,16 @@
         .result, .booster-link {
             margin-top: 20px;
             font-size: 1.2em;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
         }
     </style>
 </head>
@@ -45,8 +62,8 @@
 
     <button onclick="calculateDream()">Calculate</button>
 
-    <div class="result" id="result"></div>
-    <div class="booster-link" id="boosterLink"></div>
+    <div class="result fade-in" id="result"></div>
+    <div class="booster-link fade-in" id="boosterLink"></div>
 
     <script>
         function calculateDream() {
@@ -72,14 +89,23 @@
             localStorage.setItem('monthlyIncome', monthlyIncome);
             localStorage.setItem('monthsRequired', monthsRequired);
 
-            if (monthsRequired <= 12) {
-                resultDiv.innerHTML = `You can achieve your dream in ${Math.round(monthsRequired)} months.`;
-                boosterLinkDiv.innerHTML = '';
-            } else {
-                const years = (monthsRequired / 12).toFixed(2);
-                resultDiv.innerHTML = `You will need ${Math.round(monthsRequired)} months (${years} years) to achieve your dream.`;
-                boosterLinkDiv.innerHTML = 'Want to get it faster? <a href="booster.html">Get it faster HERE</a>';
-            }
+            // Display result with animation
+            resultDiv.classList.remove('fade-in');
+            boosterLinkDiv.classList.remove('fade-in');
+
+            setTimeout(() => {
+                resultDiv.classList.add('fade-in');
+                boosterLinkDiv.classList.add('fade-in');
+
+                if (monthsRequired <= 12) {
+                    resultDiv.innerHTML = `You can achieve your dream in ${Math.round(monthsRequired)} months.`;
+                    boosterLinkDiv.innerHTML = '';
+                } else {
+                    const years = (monthsRequired / 12).toFixed(2);
+                    resultDiv.innerHTML = `You will need ${Math.round(monthsRequired)} months (${years} years) to achieve your dream.`;
+                    boosterLinkDiv.innerHTML = 'Want to get it faster? <a href="booster.html">Get it faster HERE</a>';
+                }
+            }, 0);
         }
     </script>
 

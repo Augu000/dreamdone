@@ -6,20 +6,27 @@
     <title>Get Your Dream</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
         }
         input[type="number"] {
-            width: 200px;
-            padding: 8px;
-            margin: 5px;
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         button {
-            padding: 10px 15px;
+            padding: 10px 20px;
             background-color: #007bff;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         button:hover {
             background-color: #0056b3;
@@ -27,12 +34,22 @@
         .result {
             margin-top: 20px;
             font-size: 1.2em;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
         }
     </style>
 </head>
 <body>
 
-    <h1>Get Your "<span id="dreamTitle"></span>"</h1>
+    <h1>Get Your <span id="dreamTitle"></span></h1>
 
     <p>Your monthly income after expenses is: <strong id="monthlyIncomeText"></strong> euros</p>
 
@@ -58,7 +75,8 @@
 
     <button onclick="calculateBoost()">Go</button>
 
-    <div class="result" id="boostResult"></div>
+    <div class="result fade-in" id="boostResult"></div>
+    <footer>2024 DreamDone</footer>
 
     <script>
         // Get values from localStorage
@@ -119,13 +137,17 @@
             const newTotalIncome = monthlyIncome + (totalEarnings / originalMonthsRequired); 
             const reducedMonthsRequired = dreamPrice / newTotalIncome;
 
-            // Display result
+            // Display result with animation
             const boostResultDiv = document.getElementById('boostResult');
-            boostResultDiv.innerHTML = `
-                With your boost, you can now achieve your dream in ${Math.round(reducedMonthsRequired)} months 
-                instead of ${Math.round(originalMonthsRequired)} months!<br>
-                You earned an additional €${totalEarnings.toFixed(2)} from your investments and other sources.
-            `;
+            boostResultDiv.classList.remove('fade-in');
+            setTimeout(() => {
+                boostResultDiv.classList.add('fade-in');
+                boostResultDiv.innerHTML = `
+                    With your boost, you can now achieve your dream in ${Math.round(reducedMonthsRequired)} months 
+                    instead of ${Math.round(originalMonthsRequired)} months!<br>
+                    You earned an additional €${totalEarnings.toFixed(2)} from your investments and other sources.
+                `;
+            }, 0);
         }
     </script>
 
