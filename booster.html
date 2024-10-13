@@ -122,6 +122,7 @@
 
     <div class="error" id="errorMsg"></div>
     <div class="result fade-in" id="boostResult"></div>
+    <div>That's just a simulation, real life results may differ.</div>
     <footer>© 2024 DreamDone. All rights reserved.</footer>
 
     <script>
@@ -264,7 +265,7 @@
                 boostResultDiv.innerHTML = `
                     With your boost, you can now achieve your dream in ${Math.round(reducedMonthsRequired)} months 
                     instead of ${Math.round(originalMonthsRequired)} months!<br>
-                    You earned an additional €${totalEarnings.toFixed(2)} from your investments and other sources.
+                    That's because you earned an additional €${totalEarnings.toFixed(2)} from your investments and other sources.
                 `;
             }, 0);
         }
