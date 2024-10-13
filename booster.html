@@ -38,14 +38,12 @@
 
     <label><input type="checkbox" id="bankAccount"> Put money in a bank account</label><br>
     <div id="bankDetails" style="display: none;">
-        Interest Rate (%): <input type="number" id="bankInterest" placeholder="e.g., 1.5"><br>
-        Amount allocated to bank investment (€): <input type="number" id="bankAllocation" placeholder="e.g., 100"><br>
+        Profit from bank account (€): <input type="number" id="bankProfit" placeholder="e.g., 100"><br>
     </div>
 
     <label><input type="checkbox" id="investmentAccount"> Put money in an investment account (stocks)</label><br>
     <div id="investmentDetails" style="display: none;">
-        Rate of Return (%): <input type="number" id="investmentReturn" placeholder="e.g., 7"><br>
-        Amount allocated to stock investment (€): <input type="number" id="investmentAllocation" placeholder="e.g., 200"><br>
+        Profit from investment account (€): <input type="number" id="investmentProfit" placeholder="e.g., 200"><br>
     </div>
 
     <label><input type="checkbox" id="secondJob"> Get another job</label><br>
@@ -95,18 +93,14 @@
 
             // Bank investment calculation (if selected)
             if (document.getElementById('bankAccount').checked) {
-                const bankInterest = parseFloat(document.getElementById('bankInterest').value) || 0;
-                const bankAllocation = parseFloat(document.getElementById('bankAllocation').value) || 0;
-                
-                totalEarnings += bankAllocation * (bankInterest / 100) * (originalMonthsRequired / 12);
+                const bankProfit = parseFloat(document.getElementById('bankProfit').value) || 0;
+                totalEarnings += bankProfit * originalMonthsRequired;
             }
 
             // Stock investment calculation (if selected)
             if (document.getElementById('investmentAccount').checked) {
-                const investmentReturn = parseFloat(document.getElementById('investmentReturn').value) || 0;
-                const investmentAllocation = parseFloat(document.getElementById('investmentAllocation').value) || 0;
-                
-                totalEarnings += investmentAllocation * (investmentReturn / 100) * (originalMonthsRequired / 12);
+                const investmentProfit = parseFloat(document.getElementById('investmentProfit').value) || 0;
+                totalEarnings += investmentProfit * originalMonthsRequired;
             }
 
             // Additional job income (if selected)
@@ -130,7 +124,7 @@
             boostResultDiv.innerHTML = `
                 With your boost, you can now achieve your dream in ${Math.round(reducedMonthsRequired)} months 
                 instead of ${Math.round(originalMonthsRequired)} months!<br>
-                You earned an additional €${totalEarnings.toFixed(2)} from your investments.
+                You earned an additional €${totalEarnings.toFixed(2)} from your investments and other sources.
             `;
         }
     </script>
