@@ -46,7 +46,10 @@
             opacity: 0;
             animation: fadeIn 1s forwards;
         }
-  
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -57,13 +60,14 @@
     <input type="text" id="dreamTitle" placeholder="e.g., Buy a car"><br>
 
     <label for="dreamPrice">Dream Price (in euros):</label><br>
-    <input type="number" id="dreamPrice" placeholder="e.g., 20000"><br>
+    <input type="number" id="dreamPrice" placeholder="e.g., 20000" min="0"><br>
 
     <label for="monthlyIncome">Monthly Income After Expenses (in euros):</label><br>
-    <input type="number" id="monthlyIncome" placeholder="e.g., 500"><br><br>
+    <input type="number" id="monthlyIncome" placeholder="e.g., 500" min="0"><br><br>
 
     <button onclick="calculateDream()">Calculate</button>
 
+    <div class="error" id="errorMsg"></div>
     <div class="result fade-in" id="result"></div>
     <div class="booster-link fade-in" id="boosterLink"></div>
     <footer>© 2024 DreamDone. All rights reserved.</footer>
@@ -71,14 +75,27 @@
         function calculateDream() {
             const dreamPrice = parseFloat(document.getElementById('dreamPrice').value);
             const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value);
-            const dreamTitle = document.getElementById('dreamTitle').value;
+            const dreamTitle = document.getElementById('dreamTitle').value.trim();
             const resultDiv = document.getElementById('result');
             const boosterLinkDiv = document.getElementById('boosterLink');
+            const errorMsg = document.getElementById('errorMsg');
 
-            // Ensure input validation
-            if (!dreamPrice || !monthlyIncome || !dreamTitle) {
-                resultDiv.innerHTML = 'Please fill in all fields.';
-                boosterLinkDiv.innerHTML = '';
+            // Reset error message
+            errorMsg.innerHTML = '';
+            resultDiv.innerHTML = '';
+            boosterLinkDiv.innerHTML = '';
+
+            // Input validation
+            if (!dreamTitle) {
+                errorMsg.innerHTML = 'Please enter a dream title.';
+                return;
+            }
+            if (isNaN(dreamPrice) || dreamPrice <= 0) {
+                errorMsg.innerHTML = 'Please enter a positive number for the dream price.';
+                return;
+            }
+            if (isNaN(monthlyIncome) || monthlyIncome <= 0) {
+                errorMsg.innerHTML = 'Please enter a positive number for the monthly income.';
                 return;
             }
 

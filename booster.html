@@ -51,10 +51,13 @@
             display: none;
             margin-bottom: 20px;
         }
-        .go_link{
+        .go_link {
             margin-top: 20px;
         }
-
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -65,7 +68,7 @@
 
     <label><input type="checkbox" id="bankAccount"> Put money in a bank account</label><br>
     <div id="bankDetails" style="display: none;">
-        Profit from bank account (€): <input type="number" id="bankProfit" placeholder="e.g., 100"><br>
+        Profit from bank account (€): <input type="number" id="bankProfit" placeholder="e.g., 100" min="0"><br>
         <div class="link-placeholder" id="bankLink">
             <a href="https://example-bank.com" target="_blank">Go to Bank Account Info</a>
         </div>
@@ -73,7 +76,7 @@
 
     <label><input type="checkbox" id="investmentAccount"> Put money in an investment account (stocks)</label><br>
     <div id="investmentDetails" style="display: none;">
-        Profit from investment account (€): <input type="number" id="investmentProfit" placeholder="e.g., 200"><br>
+        Profit from investment account (€): <input type="number" id="investmentProfit" placeholder="e.g., 200" min="0"><br>
         <div class="link-placeholder" id="investmentLink">
             <a href="https://example-investment.com" target="_blank">Learn About Investment</a>
         </div>
@@ -81,7 +84,7 @@
 
     <label><input type="checkbox" id="secondJob"> Get another job</label><br>
     <div id="jobDetails" style="display: none;">
-        Additional Monthly Income (€): <input type="number" id="additionalIncome" placeholder="e.g., 300"><br>
+        Additional Monthly Income (€): <input type="number" id="additionalIncome" placeholder="e.g., 300" min="0"><br>
         <div class="link-placeholder" id="jobLink">
             <a href="https://example-jobsite.com" target="_blank">Find Jobs</a>
         </div>
@@ -89,7 +92,7 @@
 
     <label><input type="checkbox" id="business"> Start a business</label><br>
     <div id="businessDetails" style="display: none;">
-        Expected Monthly Profit (€): <input type="number" id="businessProfit" placeholder="e.g., 1000"><br>
+        Expected Monthly Profit (€): <input type="number" id="businessProfit" placeholder="e.g., 1000" min="0"><br>
         <div class="link-placeholder" id="businessLink">
             <a href="https://example-business.com" target="_blank">Start Your Business</a>
         </div>
@@ -97,6 +100,7 @@
 
     <button onclick="calculateBoost()" class="go_link">Go</button>
 
+    <div class="error" id="errorMsg"></div>
     <div class="result fade-in" id="boostResult"></div>
     <footer>© 2024 DreamDone. All rights reserved.</footer>
 
@@ -134,37 +138,73 @@
 
         function calculateBoost() {
             let totalEarnings = 0;
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.innerHTML = '';
+            const boostResultDiv = document.getElementById('boostResult');
+            boostResultDiv.innerHTML = '';
 
             // Bank investment calculation (if selected)
             if (document.getElementById('bankAccount').checked) {
-                const bankProfit = parseFloat(document.getElementById('bankProfit').value) || 0;
+                const bankProfitInput = document.getElementById('bankProfit').value;
+                const bankProfit = parseFloat(bankProfitInput);
+                if (isNaN(bankProfit) || bankProfit < 0) {
+                    errorMsg.innerHTML = 'Please enter a positive number for bank profit.';
+                    return;
+                }
                 totalEarnings += bankProfit * originalMonthsRequired;
             }
 
             // Stock investment calculation (if selected)
             if (document.getElementById('investmentAccount').checked) {
-                const investmentProfit = parseFloat(document.getElementById('investmentProfit').value) || 0;
+                const investmentProfitInput = document.getElementById('investmentProfit').value;
+                const investmentProfit = parseFloat(investmentProfitInput);
+                if (isNaN(investmentProfit) || investmentProfit < 0) {
+                    errorMsg.innerHTML = 'Please enter a positive number for investment profit.';
+                    return;
+                }
                 totalEarnings += investmentProfit * originalMonthsRequired;
             }
 
             // Additional job income (if selected)
             if (document.getElementById('secondJob').checked) {
-                const additionalIncome = parseFloat(document.getElementById('additionalIncome').value) || 0;
+                const additionalIncomeInput = document.getElementById('additionalIncome').value;
+                const additionalIncome = parseFloat(additionalIncomeInput);
+                if (isNaN(additionalIncome) || additionalIncome < 0) {
+                    errorMsg.innerHTML = 'Please enter a positive number for additional income.';
+                    return;
+                }
                 totalEarnings += additionalIncome * originalMonthsRequired;
             }
 
             // Business profit (if selected)
             if (document.getElementById('business').checked) {
-                const businessProfit = parseFloat(document.getElementById('businessProfit').value) || 0;
+                const businessProfitInput = document.getElementById('businessProfit').value;
+                const businessProfit = parseFloat(businessProfitInput);
+                if (isNaN(businessProfit) || businessProfit < 0) {
+                    errorMsg.innerHTML = 'Please enter a positive number for business profit.';
+                    return;
+                }
                 totalEarnings += businessProfit * originalMonthsRequired;
+            }
+
+            // Ensure totalEarnings is not zero to prevent division by zero
+            if (totalEarnings === 0) {
+                errorMsg.innerHTML = 'Please select at least one option and enter a positive value.';
+                return;
             }
 
             // Calculate new time to achieve dream based on total earnings
             const newTotalIncome = monthlyIncome + (totalEarnings / originalMonthsRequired); 
+
+            // Ensure newTotalIncome is positive
+            if (newTotalIncome <= 0) {
+                errorMsg.innerHTML = 'Total income must be greater than zero.';
+                return;
+            }
+
             const reducedMonthsRequired = dreamPrice / newTotalIncome;
 
             // Display result with animation
-            const boostResultDiv = document.getElementById('boostResult');
             boostResultDiv.classList.remove('fade-in');
             setTimeout(() => {
                 boostResultDiv.classList.add('fade-in');
